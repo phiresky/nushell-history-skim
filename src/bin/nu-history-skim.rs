@@ -1,15 +1,14 @@
-use std::{path::PathBuf, time::Duration};
+use std::time::Duration;
 
-use ansi_term::ANSIGenericString;
 use chrono::{DateTime, Utc};
 use clap::Parser;
 use enum_map::enum_map;
 use enum_map::Enum;
 use nu_path;
 use reedline::CommandLineSearch;
+use reedline::History;
 use reedline::SearchDirection;
 use reedline::SearchFilter;
-use reedline::{History, HistoryItemId};
 use reedline::{HistoryItem, SearchQuery};
 use skim::prelude::*;
 
@@ -132,7 +131,7 @@ impl SkimItem for HistoryItemSkim {
         (&self.0.command_line).into()
     }
 
-    fn display<'a>(&'a self, context: DisplayContext<'a>) -> AnsiString<'a> {
+    fn display<'a>(&'a self, _context: DisplayContext<'a>) -> AnsiString<'a> {
         let item = &self.0;
         let date = item
             .start_timestamp
@@ -150,7 +149,6 @@ impl SkimItem for HistoryItemSkim {
     }
 
     fn preview(&self, _context: PreviewContext) -> ItemPreview {
-        let dbg = format!("{:?}", self.0);
         let item = &self.0;
         use ansi_term::{Colour::*, Style};
 
@@ -213,7 +211,7 @@ fn send_entries(location: Location, start_query: &str, sender: SkimItemSender) {
     let history = reedline::SqliteBackedHistory::with_file(path).unwrap();
     let mut filter = SearchFilter::anything();
     filter.command_line = Some(CommandLineSearch::Substring(start_query.to_string()));
-    filter.hostname =  if location == Location::Everywhere {
+    filter.hostname = if location == Location::Everywhere {
         None
     } else {
         Some(get_current_host())
@@ -231,7 +229,7 @@ fn send_entries(location: Location, start_query: &str, sender: SkimItemSender) {
             start_id: None,
             end_id: None,
             limit: None,
-            filter
+            filter,
         })
         .unwrap();
     for item in res {
