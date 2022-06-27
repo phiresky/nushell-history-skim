@@ -29,6 +29,7 @@ pub enum Location {
 }
 
 fn get_current_session_id() -> i64 {
+    // todo: no way to fetch this or filter by this right now
     1
 }
 fn get_current_dir() -> String {
